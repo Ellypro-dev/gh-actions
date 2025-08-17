@@ -18,11 +18,14 @@ jobs:
           eval $(minikube -p minikube docker-env)
           docker build -f ./Dockerfile -t devopshint/node-app:latest .
           echo -n "verifying images:"
-          docker images         
+          docker images 
     - name: Deploy to minikube
-      run:
-        kubectl apply -f k8s-node-app.yaml
+      run: kubectl apply -f k8s-node-app.yaml
+
+    - name: Wait for pod to be ready
+      run: kubectl rollout status deployment/nodejs-app --timeout=60s
+
     - name: Test service URLs
       run: |
-          minikube service list
-          minikube service nodejs-app --url
+        minikube service list
+        minikube service nodejs-app --url
